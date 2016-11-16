@@ -1,0 +1,170 @@
+Hygieia
+
+1. go to UI folder of Hygieia
+2. edited node js && npm version
+3. cd $HYGIEIA_PROJECT/UI
+# Run clean-up anything that has already happened, then manually run UI components:
+rm -Rf ./node_modules
+rm -Rf ./bower_components
+npm install -g gulp
+npm install --no-optional
+bower install
+
+# If successful, please test the build by running the following:
+gulp serve
+-----------------------------------------------------------------------
+upgrade npm to 3.5.3 in pom and clean build.
+and node to v4.0.0...
+
+------------------------------------------------------------------------
+/root/data/db
+
+[root@li851-254 ~]# mongod --dbpath /root/data/db
+2016-09-15T06:25:06.933+0000 [initandlisten] MongoDB starting : pid=15251 port=27017 dbpath=/root/data/db 64-bit host=li851-254.members.linode.com
+2016-09-15T06:25:06.933+0000 [initandlisten] db version v2.6.12
+2016-09-15T06:25:06.933+0000 [initandlisten] git version: d73c92b1c85703828b55c2916a5dd4ad46535f6a
+2016-09-15T06:25:06.934+0000 [initandlisten] build info: Linux build5.ny.cbi.10gen.cc 2.6.32-431.3.1.el6.x86_64 #1 SMP Fri Jan 3 21:39:27 UTC 2014 x86_64 BOOST_LIB_VERSION=1_49
+2016-09-15T06:25:06.934+0000 [initandlisten] allocator: tcmalloc
+2016-09-15T06:25:06.934+0000 [initandlisten] options: { storage: { dbPath: "/root/data/db" } }
+2016-09-15T06:25:06.935+0000 [initandlisten] journal dir=/root/data/db/journal
+2016-09-15T06:25:06.935+0000 [initandlisten] recover : no journal files present, no recovery needed
+2016-09-15T06:25:07.062+0000 [initandlisten] ERROR: listen(): bind() failed errno:98 Address already in use for socket: 0.0.0.0:27017
+2016-09-15T06:25:07.062+0000 [initandlisten] ERROR:   addr already in use
+2016-09-15T06:25:07.062+0000 [initandlisten] allocating new ns file /root/data/db/local.ns, filling with zeroes...
+2016-09-15T06:25:07.111+0000 [FileAllocator] allocating new datafile /root/data/db/local.0, filling with zeroes...
+2016-09-15T06:25:07.111+0000 [FileAllocator] creating directory /root/data/db/_tmp
+2016-09-15T06:25:07.115+0000 [FileAllocator] done allocating datafile /root/data/db/local.0, size: 64MB,  took 0 secs
+2016-09-15T06:25:07.116+0000 [initandlisten] build index on: local.startup_log properties: { v: 1, key: { _id: 1 }, name: "_id_", ns: "local.startup_log" }
+2016-09-15T06:25:07.116+0000 [initandlisten]     added index to empty collection
+2016-09-15T06:25:07.120+0000 [initandlisten] now exiting
+2016-09-15T06:25:07.120+0000 [initandlisten] dbexit:
+2016-09-15T06:25:07.120+0000 [initandlisten] shutdown: going to close listening sockets...
+2016-09-15T06:25:07.120+0000 [initandlisten] shutdown: going to flush diaglog...
+2016-09-15T06:25:07.121+0000 [initandlisten] shutdown: going to close sockets...
+2016-09-15T06:25:07.121+0000 [initandlisten] shutdown: waiting for fs preallocator...
+2016-09-15T06:25:07.121+0000 [initandlisten] shutdown: lock for final commit...
+2016-09-15T06:25:07.121+0000 [initandlisten] shutdown: final commit...
+2016-09-15T06:25:07.127+0000 [initandlisten] shutdown: closing all files...
+2016-09-15T06:25:07.127+0000 [initandlisten] closeAllFiles() finished
+2016-09-15T06:25:07.127+0000 [initandlisten] journalCleanup...
+2016-09-15T06:25:07.127+0000 [initandlisten] removeJournalFiles
+2016-09-15T06:25:07.128+0000 [initandlisten] shutdown: removing fs lock...
+2016-09-15T06:25:07.128+0000 [initandlisten] dbexit: really exiting now
+
+
+[root@li851-254 ~]# service mongod status
+mongod (pid 15228) is running...
+[root@li851-254 ~]# service mongod stop
+Stopping mongod:                                           [  OK  ]
+[root@li851-254 ~]# mongod --dbpath /root/data/db
+2016-09-15T06:27:45.870+0000 [initandlisten] MongoDB starting : pid=15325 port=27017 dbpath=/root/data/db 64-bit host=li851-254.members.linode.com
+2016-09-15T06:27:45.871+0000 [initandlisten] db version v2.6.12
+2016-09-15T06:27:45.871+0000 [initandlisten] git version: d73c92b1c85703828b55c2916a5dd4ad46535f6a
+2016-09-15T06:27:45.871+0000 [initandlisten] build info: Linux build5.ny.cbi.10gen.cc 2.6.32-431.3.1.el6.x86_64 #1 SMP Fri Jan 3 21:39:27 UTC 2014 x86_64 BOOST_LIB_VERSION=1_49
+2016-09-15T06:27:45.871+0000 [initandlisten] allocator: tcmalloc
+2016-09-15T06:27:45.871+0000 [initandlisten] options: { storage: { dbPath: "/root/data/db" } }
+2016-09-15T06:27:45.872+0000 [initandlisten] journal dir=/root/data/db/journal
+2016-09-15T06:27:45.872+0000 [initandlisten] recover : no journal files present, no recovery needed
+2016-09-15T06:27:45.924+0000 [initandlisten] waiting for connections on port 27017
+2016-09-15T06:28:45.929+0000 [clientcursormon] mem (MB) res:43 virt:435
+2016-09-15T06:28:45.929+0000 [clientcursormon]  mapped (incl journal view):160
+2016-09-15T06:28:45.929+0000 [clientcursormon]  connections:0
+
+
+dbname=dashboard
+dbusername=dashboarduser
+dbpassword=dbpassword
+dbhost=li851-254.members.linode.com
+dbport=27017
+
+
+
+gulp serve &
+
+  mongodb-linux-x86_64-rhel62-3.2.10/bin/mongod --dbpath=/root/data/db/ &
+  
+  java -jar api.jar  --spring.config.location=/root/Hygieia/api/dashboard.properties &
+  
+   java -jar jenkins-build-collector-2.0.4-SNAPSHOT.jar --spring.config.name=jenkins --spring.config.location=/root/Hygieia/collectors/build/jenkins/application.properties &
+
+    java -jar subversion-collector-2.0.4-SNAPSHOT.jar --spring.config.name=svn --spring.config.location=/root/Hygieia/collectors/scm/subversion/application.properties &
+  
+  java -jar sonar-codequality-collector-2.0.4-SNAPSHOT.jar --spring.config.name=sonar --spring.config.location=/root/Hygieia/collectors/build/sonar/application.properties &
+  
+   java -jar github-scm-collector-2.0.4-SNAPSHOT.jar --spring.config.name=git --spring.config.location=/root/Hygieia/collectors/scm/github/application.properties &
+  
+  /usr/local/sonarqube-5.0.1/bin/linux-x86-64/
+  
+  
+  java -jar jira-feature-collector.jar --spring.config.name=jira --spring.config.location=/root/Hygieia/collectors/feature/jira/application.properties
+  
+sonar.sourceEncoding=UTF-8
+sonar.host.url=http://devopsdashboard.happiestminds.com:9000/
+sonar.jdbc.url=jdbc:mysql://localhost:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance
+sonar.jdbc.driverClassName=com.mysql.jdbc.Driver
+sonar.jdbc.username=sonar
+sonar.jdbc.password=sonar
+
+sonar.sources=/var/lib/jenkins/jobs/Helloworld/workspace/HelloWorld.java
+
+  
+  
+gulp serve &
+
+
+Screenshots
+1. hygieia publisher plugin details
+2. write ups
+3. Deployment pipeline
+
+
+http://dev.mamikon.net/installing-sonarqube-runner-on-ubuntu/
+Sonar_runner installation
+
+export SONAR_RUNNER_HOME=/opt/sonar-runner
+export PATH=$PATH:/opt/sonar-runner/bin
+
+
+JIRA
+http://devopsdashboard.happiestminds.com:8000/secure/SetupMode!default.jspa
+
+CREATE USER 'jiradbuser'@'devopsdashboard.happiestminds.com' IDENTIFIED BY 'jiradbpass';
+
+ CREATE DATABASE jiradb CHARACTER SET utf8 COLLATE utf8_bin;
+
+GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,ALTER,INDEX on jiradb.* TO 'jiradbuser'@'devopsdashboard.happiestminds.com' IDENTIFIED BY 'jiradbpass';
+
+
+SHOW GRANTS FOR jiradbuser@devopsdashboard.happiestminds.com;
+
+
+Installation Directory: /opt/atlassian/jira
+Home Directory: /var/atlassian/application-data/jira
+HTTP Port: 8000
+RMI Port: 8005
+
+
+/opt/atlassian/jira/lib
+
+BHUE-9TT9-W59L-58A7
+
+AAABeQ0ODAoPeNp9kctOwzAQRff5ikhsYOGoKfQpWaIklhqUPtQE2LAx7rQYNY41dgr8PW5TREsfyxl77px752pUKn8irB92/EbYv7vt37X8KM79ZiNse0sEUO+l1oBBKgUoA2wurSwVZeOczaazJGPeuCreACeLJwNoKAm9D4k8OOpOKxTv3EDMLdCNPAkbJOx4O+H8W8OYF0CjyWjEZlEySH+f2JeW+L03FxIHF5XKcmHZiMsVnVe45MLAG9wvC9cIRFl4GeAaMInpw/CJkV6e98hLq5eSVnfQqSE1lvNK2GBTEFMu7CdHCJyqXAO1WEH97bz3EwmdMuIYlQXFlThj5gLNUZC7Pc5XmsQZG5O02+70us2u5wp60Lggm1mOFpAu+MqAN3HxKWn41t+Qay3B2EKqufEihG37/91WNcazo9oMNQ+yAGcXNUqzizEGI1DqrfxjMhv42Y7Dv66vdPPa99mar6rtrhr83B1OJby/fH/uT7OufwBsywFkMCwCFG7DBACC4YjFEBAebfl5MoZWp96DAhQQGROHqRODC6TTCrutmwZa3+HAqg==X02ie
+
+
+Full name 
+Happiestminds Devops
+Email Address 
+durgadevi.ramadoss@happiestminds.com
+Username 
+devops
+Password 
+devops@123
+Confirm Password 
+devops@123
+ Next
+
+ 
+ 
+ Bitbucket : Durga_devops 
+ username: durgadevi.ramadoss@happiestminds.com
+password: devops@123
