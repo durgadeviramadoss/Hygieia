@@ -1,0 +1,158 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+	
+    "Description": "AWS CloudFormation Template to provision JIRA RDS from snapshot, JIRA Server instance from JIRA base AMI and JIRA server instance with RDS",
+	
+    "Parameters": {
+		
+		"JIRAServerVolumeMountPoint" : {
+			"Description": "Mount point of JIRA Server EBS volume.",
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "",
+			"AllowedPattern" : "([/]{1}[A-Za-z0-9]*)",
+			"AllowedValues": ["/vol"],
+			"ConstraintDescription" : "Must be a valid and non-empty Volume mount point. eg./vol"
+		}		
+    },
+	
+	"Mappings" : {
+		"SubnetToAvailabilityZone" : {
+			"subnet-76774c5e" : { "zone" : "us-east-1a" },
+			"subnet-5d30ed2a" : { "zone" : "us-east-1b" },
+			"subnet-51774c79" : { "zone" : "us-east-1a" },
+			"subnet-4730ed30" : { "zone" : "us-east-1b" },
+			"subnet-59774c71" : { "zone" : "us-east-1a" },
+			"subnet-5830ed2f" : { "zone" : "us-east-1b" } 
+		},
+		"InstallationOptionToCFN" : {
+			"1" : { "URL" : "https://s3.amazonaws.com/com-lfg-edm-dev-code/CloudFormation/Templates/lfg-edm-cfn_jira_rds_provisioning.cfn" },
+			"2" : { "URL" : "https://s3.amazonaws.com/com-lfg-edm-dev-code/CloudFormation/Templates/lfg-edm-cfn_jira_instance_provisioning.cfn" },
+			"3" : { "URL" : "https://s3.amazonaws.com/com-lfg-edm-dev-code/CloudFormation/Templates/lfg-edm-cfn_jira_rds_MultiAZ_instance_provisioning.cfn" },
+			"4" : { "URL" : "https://s3.amazonaws.com/com-lfg-edm-dev-code/CloudFormation/Templates/lfg-edm-cfn_jira_rds_NonMultiAZ_instance_provisioning.cfn" }
+		}
+	},
+	"Conditions" : {
+		"JIRARDSProvisioning" : {"Fn::Equals" : [{"Ref" : "InstallationOption"}, "1"]},
+		"JIRAInstanceProvisioning" : {"Fn::Equals" : [{"Ref" : "InstallationOption"}, "2"]},
+		"JIRARDSMultiAZInstanceProvisioning" : {"Fn::Equals" : [{"Ref" : "InstallationOption"}, "3"]},
+		"JIRARDSNonMultiAZInstanceProvisioning" : {"Fn::Equals" : [{"Ref" : "InstallationOption"}, "4"]}
+	},
+    "Resources": {
+		"VPC": {
+			"Type" : "AWS::EC2::VPC",
+			"Properties" : {
+				"CidrBlock" : { "Ref" : "" },
+				"EnableDnsSupport" : { "Ref" : "" },
+				"EnableDnsHostnames" : { "Ref" : "" },
+				"Tags": [{ "Key": "Name", "Value": { "Ref" : "VPCName" } }]
+			}
+		},
+		"Public_Subnet_us_east_1a":{
+			"Type" : "AWS::EC2::Subnet",
+			"Properties" : {
+				"AvailabilityZone" : String,
+				"CidrBlock" : String,
+				"MapPublicIpOnLaunch" : Boolean,
+				"Tags": [{ "Key": "Name", "Value": { "Ref" : "PublicSubnetName" } }]
+				"VpcId" : {"Ref": "VPC"}
+			}
+		} ,
+		"Private_Subnet_us_east_1a":{
+			"Type" : "AWS::EC2::Subnet",
+			"Properties" : {
+				"AvailabilityZone" : String,
+				"CidrBlock" : String,
+				"MapPublicIpOnLaunch" : Boolean,
+				"Tags": [{ "Key": "Name", "Value": { "Ref" : "PrivateSubnetName" } }]
+				"VpcId" : {"Ref": "VPC"}
+			}
+		},
+		"Public_subnet_route_table":{
+			"Type" : "AWS::EC2::RouteTable",
+			"Properties" : {
+				"VpcId" : { "Ref" : "VPC" },
+				"Tags": [{ "Key": "Name", "Value": { "Ref" : "PublicSubnetRouteTable" } }]
+			}
+		},
+		"Public_route":{
+			"Type" : "AWS::EC2::Route",
+			"Properties" : {
+				"DestinationCidrBlock" : "0.0.0.0/0",
+				"GatewayId" : { "Ref" : "igw" },
+				"RouteTableId" : { "Ref" : "Public_subnet_route_table"}
+			}
+		},
+		"Private_subnet_route_table":{
+			"Type" : "AWS::EC2::RouteTable",
+			"Properties" : {
+				"VpcId" : { "Ref" : "VPC" },
+				"Tags": [{ "Key": "Name", "Value": { "Ref" : "PublicSubnetRouteTable" } }]
+			}
+		},
+		"Private_route":{
+			"Type" : "AWS::EC2::Route",
+			"Properties" : {
+				"DestinationCidrBlock" : "0.0.0.0/0",
+				"InstanceId" : { "Ref" : ""},
+				"RouteTableId" : { "Ref" : "Private_subnet_route_table"}
+			}
+		},
+		"Public_subnet_Route_Association" :{
+			"Type" : "AWS::EC2::SubnetRouteTableAssociation",
+			"Properties" : {
+				"RouteTableId" : { "Ref" : "Public_subnet_route_table"}
+				"SubnetId" : { "Ref" : "Public_Subnet_us_east_1a" } 
+			}
+		},
+		"Private_subnet_Route_Association" :{
+			"Type" : "AWS::EC2::SubnetRouteTableAssociation",
+			"Properties" : {
+				"RouteTableId" : { "Ref" : "Private_subnet_route_table"}
+				"SubnetId" : { "Ref" : "Private_Subnet_us_east_1a" } 
+			}
+		},
+		"igw": {
+			"Type" : "AWS::EC2::InternetGateway",
+			"Properties" : {
+			"Tags": [{ "Key": "Name", "Value": { "Ref" : "IgwName" } }]
+			}
+		},
+		"VPCGatewayAttachment": {
+			"Type" : "AWS::EC2::VPCGatewayAttachment",
+			"Properties" : {
+				"InternetGatewayId" : { "Ref" : "igw"},
+				"VpcId" : { "Ref" : "VPC"}
+			}
+		},
+		"NAT1" : {
+            "Type" : "AWS::EC2::Instance",
+            "DependsOn" : "VPCGatewayAttachment",
+            "Properties" : {
+                "ImageId" : { "Ref" : "NatInstanceAMI"},
+                "InstanceType" : {"Ref" : "NATInstanceType"},
+                "Tags" : [{"Key" : "Name", "Value" : "NAT1"}],
+				"AssociatePublicIpAddress" : "true",
+				"SubnetId" : {"Ref" : "PublicSubnetAZ1"},
+				"DeleteOnTermination" : "true",
+				"SecurityGroupIds" : [ {"Ref" : "NatSecurityGroup" }],
+                "KeyName"           : {
+                    "Ref" : "KeyPairName"
+                },
+                "SourceDestCheck"   : "false"
+           }
+		},
+		"NatGateway" : {
+		
+		}
+	},
+	
+	"Outputs" : {
+		"template": {
+            "Value": {
+               "Ref" : "AWS::StackId"
+            }
+        }		
+	}
+}
