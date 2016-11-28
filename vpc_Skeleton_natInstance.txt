@@ -1,0 +1,511 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+
+	"Description": "AWS CloudFormation Template to provision VPC and Subnet",
+
+	"Metadata": {
+		"AWS::CloudFormation::Interface": {
+			"ParameterGroups": [{
+				"Label": {
+					"default": "VPC Configuration"
+				},
+				"Parameters": [
+					"VPCName",
+					"VPCCidrIP",
+					"VPCCidrSubnetMask",
+					"VPCDnsSupport",
+					"VPCDnsHostnames"
+				]
+			}, {
+				"Label": {
+					"default": "Public Subnet Configuration"
+				},
+				"Parameters": [
+					"PublicSubnetName",
+					"PublicSubnet1aCIDR",
+					"PublicSubnetRouteTableName",
+					"IgwName"
+				]
+			}, {
+				"Label": {
+					"default": "Private Subnet Configuration"
+				},
+				"Parameters": [
+					"PrivateSubnetName",
+					"PrivateSubnet1aCIDR",
+					"PrivateSubnetRouteTableName"
+				]
+			}, {
+				"Label": {
+					"default": "NAT instance Configuration"
+				},
+				"Parameters": [
+					"NATinstanceName",
+					"NatInstanceAMI",
+					"NATInstanceType",
+					"KeyPairName"
+				]
+			}],
+			"ParameterLabels": {
+				"VPCName": {
+					"default": "VPC Name"
+				},
+				"VPCCidrIP": {
+					"default": "VPC CIDR IP"
+				},
+				"VPCCidrSubnetMask": {
+					"default": "VPC CIDR Subnet Mask"
+				},
+				"VPCDnsSupport": {
+					"default": "VPC Dns Support"
+				},
+				"VPCDnsHostnames": {
+					"default": "VPC Dns Hostnames"
+				},
+
+				"PublicSubnetName": {
+					"default": "Public Subnet Name"
+				},
+				"PublicSubnet1aCIDR": {
+					"default": "Public Subnet us-east-1a CIDR"
+				},
+				"PublicSubnetRouteTableName": {
+					"default": "Public Subnet RouteTable Name"
+				},
+				"IgwName": {
+					"default": "Internet gateway Name"
+				},
+				"PrivateSubnetName": {
+					"default": "Private Subnet Name"
+				},
+				"PrivateSubnet1aCIDR": {
+					"default": "Private Subnet us-east-1a CIDR"
+				},
+				"PrivateSubnetRouteTableName": {
+					"default": "Private Subnet RouteTable Name"
+				},
+				"NATinstanceName": {
+					"default": "NAT instance Name"
+				},
+				"NatInstanceAMI": {
+					"default": "NatInstance AMI"
+				},
+				"NATInstanceType": {
+					"default": "NAT Instance Type"
+				},
+				"KeyPairName": {
+					"default": "Key Pair Name"
+				}
+
+			}
+		}
+	},
+	"Parameters": {
+
+		"VPCName": {
+			"Description": "Name of the VPC to be created",
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "VPC",
+			"AllowedPattern": "([A-Za-z0-9]*)",
+			"ConstraintDescription": "Must be a valid VPC name"
+		},
+		"VPCCidrIP": {
+			"Description": "CIDR IP of the VPC to be created",
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "10.0.0.0",
+			"AllowedPattern": "([0-9]*.[0-9]*.[0-9]*.[0-9]*)",
+			"ConstraintDescription": "Must be a valid IP range. eg. 10.0.0.0"
+		},
+		"VPCCidrSubnetMask": {
+			"Description": "Subnet mask of VPC to be created",
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "16",
+			"AllowedPattern": "([0-9]{2})",
+			"ConstraintDescription": "Must be a valid subnet mask range. eg. 16"
+		},
+		"VPCDnsSupport": {
+			"Description": "Enbale or Disable VPC DNS Support",
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "true",
+			"AllowedValues": ["true", "false"],
+			"ConstraintDescription": "Must be a boolean value: eg. yes or no"
+		},
+		"VPCDnsHostnames": {
+			"Description": "Enbale or Disable VPC Host Names",
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "true",
+			"AllowedValues": ["true", "false"],
+			"ConstraintDescription": "Must be a boolean value: eg. yes or no"
+		},
+		"PublicSubnetName": {
+			"Description": "Name the public subnet to be created",
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "publicSubnetName",
+			"AllowedPattern": "([a-zA-Z0-9]*)",
+			"ConstraintDescription": "Must be a valid Subnet name"
+		},
+		"PrivateSubnetName": {
+			"Description": "Name the private subnet to be created",
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "privateSubnetName",
+			"AllowedPattern": "([a-zA-Z0-9]*)",
+			"ConstraintDescription": "Must be a valid Subnet name"
+		},
+		"PublicSubnet1aCIDR": {
+			"Description": "CIDR range of the public subnet to be created",
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "10.0.0.0/28",
+			"AllowedPattern": "([0-9]*.[0-9]*.[0-9]*.[0-9]*/[0-9]{2})",
+			"ConstraintDescription": "Must be a valid CIDR range. eg. 10.0.0.0/24"
+		},
+		"PrivateSubnet1aCIDR": {
+			"Description": "CIDR range of the private subnet to be created",
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "10.0.0.16/28",
+			"AllowedPattern": "([0-9]*.[0-9]*.[0-9]*.[0-9]*/[0-9]{2})",
+			"ConstraintDescription": "Must be a valid CIDR range. eg. 10.0.0.0/24"
+		},
+		"PublicSubnetRouteTableName": {
+			"Description": "Name of the public route table",
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "publicRouteTable",
+			"AllowedPattern": "([a-zA-Z0-9]*)",
+			"ConstraintDescription": "Must be a valid Name"
+		},
+		"PrivateSubnetRouteTableName": {
+			"Description": "Name of the public route table",
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "PrivateRouteTable",
+			"AllowedPattern": "([a-zA-Z0-9]*)",
+			"ConstraintDescription": "Must be a valid Name"
+		},
+		"IgwName": {
+			"Description": "Name of the internet Gateway to be created",
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "internetGateWay",
+			"AllowedPattern": "([a-zA-Z0-9]*)",
+			"ConstraintDescription": "Must be a valid name"
+		},
+		"NatInstanceAMI": {
+			"Description": "AMI Id of the NAT instance to be created",
+			"Type": "AWS::EC2::Image::Id",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "ami-184dc970",
+			"ConstraintDescription": "Must be a valid AMI"
+		},
+		"NATInstanceType": {
+			"Description": "Type of the NAT instance to be created",
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "t2.micro",
+			"AllowedValues": ["t1.micro", "t2.micro", "t2.small", "t2.medium", "m1.small", "m1.medium", "m1.large",
+				"m1.xlarge", "m2.xlarge", "m2.2xlarge", "m2.4xlarge", "m3.medium", "m3.large", "m3.xlarge", "m3.2xlarge",
+				"m4.large", "m4.xlarge", "m4.2xlarge", "m4.4xlarge", "m4.10xlarge", "c1.medium", "c1.xlarge", "c3.large",
+				"c3.xlarge", "c3.2xlarge", "c3.4xlarge", "c3.8xlarge", "c4.large", "c4.xlarge", "c4.2xlarge", "c4.4xlarge",
+				"c4.8xlarge", "g2.2xlarge", "r3.large", "r3.xlarge", "r3.2xlarge", "r3.4xlarge", "r3.8xlarge", "i2.xlarge",
+				"i2.2xlarge", "i2.4xlarge", "i2.8xlarge", "d2.xlarge", "d2.2xlarge", "d2.4xlarge", "d2.8xlarge", "hi1.4xlarge",
+				"hs1.8xlarge", "cr1.8xlarge", "cc2.8xlarge", "cg1.4xlarge"
+			],
+			"ConstraintDescription": "Must be a valid instance type"
+		},
+		"NATinstanceName": {
+			"Description": "Name of the NAT instance to be created",
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "NatInstance",
+			"AllowedPattern": "([a-zA-Z0-9]*)",
+			"ConstraintDescription": "Must be a valid name"
+		},
+		"KeyPairName": {
+			"Description": "Key Pair name to be attached with NAT instance",
+			"Type": "AWS::EC2::KeyPair::KeyName",
+			"MinLength": "1",
+			"MaxLength": "64",
+			"Default": "KeypairName",
+			"ConstraintDescription": "Must be a valid Key pair"
+
+		}
+
+	},
+
+	"Mappings": {
+
+	},
+	"Conditions": {
+
+	},
+	"Resources": {
+		"VPC": {
+			"Type": "AWS::EC2::VPC",
+			"Properties": {
+				"CidrBlock": {
+					"Fn::Join": ["", [{
+						"Ref": "VPCCidrIP"
+					}, "/", {
+						"Ref": "VPCCidrSubnetMask"
+					}]]
+				},
+				"EnableDnsSupport": {
+					"Ref": "VPCDnsSupport"
+				},
+				"EnableDnsHostnames": {
+					"Ref": "VPCDnsHostnames"
+				},
+				"Tags": [{
+					"Key": "Name",
+					"Value": {
+						"Ref": "VPCName"
+					}
+				}]
+			}
+		},
+		"PublicSubnetUsEast1a": {
+			"Type": "AWS::EC2::Subnet",
+			"Properties": {
+				"VpcId": {
+					"Ref": "VPC"
+				},
+				"CidrBlock": "10.0.0.0/28",
+				"Tags": [{
+					"Key": "Application",
+					"Value": {
+						"Ref": "AWS::StackId"
+					}
+				}]
+			}
+		},
+		"PrivateSubnetUsEast1a": {
+			"Type": "AWS::EC2::Subnet",
+			"Properties": {
+				"VpcId": {
+					"Ref": "VPC"
+				},
+				"CidrBlock": "10.0.0.16/28",
+				"Tags": [{
+					"Key": "Application",
+					"Value": {
+						"Ref": "AWS::StackId"
+					}
+				}]
+			}
+		},
+		"PublicSubnetRouteTable": {
+			"Type": "AWS::EC2::RouteTable",
+			"Properties": {
+				"VpcId": {
+					"Ref": "VPC"
+				},
+				"Tags": [{
+					"Key": "Name",
+					"Value": {
+						"Ref": "PublicSubnetRouteTableName"
+					}
+				}]
+			}
+		},
+		"PublicRoute": {
+			"Type": "AWS::EC2::Route",
+			"Properties": {
+				"DestinationCidrBlock": "0.0.0.0/0",
+				"GatewayId": {
+					"Ref": "igw"
+				},
+				"RouteTableId": {
+					"Ref": "PublicSubnetRouteTable"
+				}
+			}
+		},
+		"PrivateSubnetRouteTable": {
+			"Type": "AWS::EC2::RouteTable",
+			"Properties": {
+				"VpcId": {
+					"Ref": "VPC"
+				},
+				"Tags": [{
+					"Key": "Name",
+					"Value": {
+						"Ref": "PrivateSubnetRouteTableName"
+					}
+				}]
+			}
+		},
+		"PrivateRoute": {
+			"Type": "AWS::EC2::Route",
+			"Properties": {
+				"DestinationCidrBlock": "0.0.0.0/0",
+				"InstanceId": {
+					"Ref": "NAT1"
+				},
+				"RouteTableId": {
+					"Ref": "PrivateSubnetRouteTable"
+				}
+			}
+		},
+		"PublicSubnetRouteAssociation": {
+			"Type": "AWS::EC2::SubnetRouteTableAssociation",
+			"Properties": {
+				"RouteTableId": {
+					"Ref": "PublicSubnetRouteTable"
+				},
+				"SubnetId": {
+					"Ref": "PublicSubnetUsEast1a"
+				}
+			}
+		},
+		"PrivateSubnetRouteAssociation": {
+			"Type": "AWS::EC2::SubnetRouteTableAssociation",
+			"Properties": {
+				"RouteTableId": {
+					"Ref": "PrivateSubnetRouteTable"
+				},
+				"SubnetId": {
+					"Ref": "PrivateSubnetUsEast1a"
+				}
+			}
+		},
+		"igw": {
+			"Type": "AWS::EC2::InternetGateway",
+			"Properties": {
+				"Tags": [{
+					"Key": "Name",
+					"Value": {
+						"Ref": "IgwName"
+					}
+				}]
+			}
+		},
+		"VPCGatewayAttachment": {
+			"Type": "AWS::EC2::VPCGatewayAttachment",
+			"Properties": {
+				"InternetGatewayId": {
+					"Ref": "igw"
+				},
+				"VpcId": {
+					"Ref": "VPC"
+				}
+			}
+		},
+		"NATSecurityGroup": {
+			"Type": "AWS::EC2::SecurityGroup",
+			"Properties": {
+				"GroupDescription": "Rules for allowing access to HA Nodes",
+				"VpcId": {
+					"Ref": "VPC"
+				},
+				"SecurityGroupIngress": [{
+					"IpProtocol": "tcp",
+					"FromPort": "22",
+					"ToPort": "22",
+					"CidrIp": "0.0.0.0/0"
+				}, {
+					"IpProtocol": "-1",
+					"FromPort": "0",
+					"ToPort": "65535",
+					"CidrIp": {
+					"Fn::Join": ["", [{
+						"Ref": "VPCCidrIP"
+					}, "/", {
+						"Ref": "VPCCidrSubnetMask"
+					}]]
+				}
+				}],
+				"SecurityGroupEgress": [{
+					"IpProtocol": "-1",
+					"FromPort": "0",
+					"ToPort": "65535",
+					"CidrIp": "0.0.0.0/0"
+				}]
+			}
+		},
+		"NATAllowICMP": {
+			"Type": "AWS::EC2::SecurityGroupIngress",
+			"Properties": {
+				"GroupId": {
+					"Ref": "NATSecurityGroup"
+				},
+				"IpProtocol": "icmp",
+				"FromPort": "-1",
+				"ToPort": "-1",
+				"SourceSecurityGroupId": {
+					"Ref": "NATSecurityGroup"
+				}
+			}
+		},
+		"NAT1": {
+			"Type": "AWS::EC2::Instance",
+			"DependsOn": "VPCGatewayAttachment",
+			"Properties": {
+				"ImageId": {
+					"Ref": "NatInstanceAMI"
+				},
+				"InstanceType": {
+					"Ref": "NATInstanceType"
+				},
+				"Tags": [{
+					"Key": "Name",
+					"Value": "NATinstanceName"
+				}],
+				"SubnetId": {
+					"Ref": "PublicSubnetUsEast1a"
+				},
+				"SecurityGroupIds": [{
+					"Ref": "NATSecurityGroup"
+				}],
+				"KeyName": {
+					"Ref": "KeyPairName"
+				},
+				"SourceDestCheck": "false"
+			}
+		},
+		"NAT1EIP": {
+			"Type": "AWS::EC2::EIP",
+			"Properties": {
+				"Domain": "vpc",
+				"InstanceId": {
+					"Ref": "NAT1"
+				}
+			}
+		}
+	},
+
+	"Outputs": {
+		"NAT1Output": {
+			"Description": "NAT #1 EIP.",
+			"Value": {
+				"Fn::Join": ["", [{
+					"Ref": "NAT1"
+				}, " (", {
+					"Ref": "NAT1EIP"
+				}, ")"]]
+			}
+		}
+
+	}
+}
