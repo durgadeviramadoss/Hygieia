@@ -1,0 +1,105 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+
+	"Description": "AWS CloudFormation Template to provision Linux Server in Private subnet",
+
+	"Parameters": {
+		"VPCId": {
+			"Description": "Select VPC CIDR to provision the instance",
+			"Type": "AWS::EC2::VPC::Id",
+			"ConstraintDescription": "Must be a valid and non-empty VPC id"
+		},
+		"SubentId": {
+			"Description": "Select subnet to provision the instance",
+			"Type": "AWS::EC2::Subnet::Id",
+			"ConstraintDescription": "Must be a valid and non-empty Subnet id"
+		},
+		"KeyPairName": {
+			"Description": "Select Keypair to provision the instance",
+			"Type": "AWS::EC2::KeyPair::KeyName",
+			"ConstraintDescription": "Must be a valid and non-empty KeyPair Name"
+		},
+		"AvailabilityZone": {
+			"Description": "Select AvailabilityZone to provision the instance",
+			"Type": "AWS::EC2::AvailabilityZone::Name",
+			"ConstraintDescription": "Must be a valid and non-empty AvailabilityZone Name"
+		},
+		"InstanceType": {
+			"Description": "Select EC2 instance type",
+			"Type": "String",
+			"Default": "t2.small",
+			"AllowedValues": ["t1.micro", "t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "m1.small", "m1.medium", "m1.large", "m1.xlarge", "m2.xlarge", "m2.2xlarge", "m2.4xlarge", "m3.medium", "m3.large", "m3.xlarge", "m3.2xlarge", "m4.large", "m4.xlarge", "m4.2xlarge", "m4.4xlarge", "m4.10xlarge", "c1.medium", "c1.xlarge", "c3.large", "c3.xlarge", "c3.2xlarge", "c3.4xlarge", "c3.8xlarge", "c4.large", "c4.xlarge", "c4.2xlarge", "c4.4xlarge", "c4.8xlarge", "g2.2xlarge", "g2.8xlarge", "r3.large", "r3.xlarge", "r3.2xlarge", "r3.4xlarge", "r3.8xlarge", "i2.xlarge", "i2.2xlarge", "i2.4xlarge", "i2.8xlarge", "d2.xlarge", "d2.2xlarge", "d2.4xlarge", "d2.8xlarge", "hi1.4xlarge", "hs1.8xlarge", "cr1.8xlarge", "cc2.8xlarge", "cg1.4xlarge"],
+			"ConstraintDescription": "must be a valid EC2 instance type."
+		},
+		"SecurityGroupIds": {
+			"Description": "Select SecurityGroupIds to provision the instance",
+			"Type": "AWS::EC2::SecurityGroup::Id",
+			"ConstraintDescription": "Must be a valid and non-empty SecurityGroup Name"
+		}
+
+	},
+	"Mappings": {
+
+		"RegionMap": {
+			"us-east-1": {
+				"32": "ami-6411e20d",
+				"64": "ami-7a11e213"
+			},
+			"us-west-1": {
+				"32": "ami-c9c7978c",
+				"64": "ami-cfc7978a"
+			},
+			"eu-west-1": {
+				"32": "ami-37c2f643",
+				"64": "ami-31c2f645"
+			},
+			"ap-southeast-1": {
+				"32": "ami-66f28c34",
+				"64": "ami-60f28c32"
+			},
+			"ap-northeast-1": {
+				"32": "ami-9c03a89d",
+				"64": "ami-a003a8a1"
+			}
+		}
+	},
+	"Resources": {
+		"LinuxPrivateInstance": {
+			"Type": "AWS::EC2::Instance",
+			"Properties": {
+				"ImageId": {
+					"Fn::FindInMap": ["RegionMap", {
+						"Ref": "AWS::Region"
+					}, "32"]
+				},
+				"InstanceType": {
+					"Ref": "InstanceType"
+				},
+				"KeyName": {
+					"Ref": "KeyPairName"
+				},
+				"SecurityGroupIds": {
+					"Ref": "SecurityGroupIds"
+				},
+				"SubnetId": {
+					"Ref": "SubentId"
+				}
+			}
+		}
+
+	},
+	"Outputs": {
+		"InstanceId": {
+			"Description": "InstanceId of the newly created EC2 instance",
+			"Value": {
+				"Ref": "LinuxPrivateInstance"
+			}
+		},
+		"InstanceIPAddress": {
+			"Description": "IP address of the newly created EC2 instance",
+			"Value": {
+				"Fn::GetAtt": ["LinuxPrivateInstance", "PrivateIp"]
+			}
+		}
+	}
+}
