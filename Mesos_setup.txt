@@ -1,0 +1,37 @@
+Mesos server setup
+1. sudo apt-key adv --keyserver keyserver.ubuntu.com --recv E56151BF
+2. 	DISTRO=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
+	CODENAME=$(lsb_release -cs)
+	echo "deb http://repos.mesosphere.io/${DISTRO} ${CODENAME} main" | \
+	sudo tee /etc/apt/sources.list.d/mesosphere.list
+3. sudo apt-get -y update
+4. sudo apt-get -y install mesos marathon
+5. sudo reboot
+6. sudo service mesos-slave stop
+7. echo manual | sudo tee /etc/init/mesos-slave.override
+8. echo ip | sudo tee /etc/mesos-master/ip
+9. echo zk://ip:2181/mesos | sudo tee /etc/mesos/zk
+10. echo MyCluster | sudo tee /etc/mesos-master/cluster
+11. sudo service zookeeper restart
+	$ sudo service mesos-master restart
+	$ sudo service marathon restart
+12. echo 1 | sudo tee /etc/zookeeper/conf/myid
+
+Mesos Agent Setup
+
+1. sudo apt-key adv --keyserver keyserver.ubuntu.com --recv E56151BF
+2. DISTRO=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
+	$ CODENAME=$(lsb_release -cs)
+	$ echo "deb http://repos.mesosphere.io/${DISTRO} ${CODENAME} main" | \
+	sudo tee /etc/apt/sources.list.d/mesosphere.list
+3.  sudo apt-get -y update
+4. sudo apt-get -y install mesos
+5. sudo reboot
+6. sudo service mesos-master stop
+	$ echo manual | sudo tee /etc/init/mesos-master.override
+7. sudo service zookeeper stop
+	$ echo manual | sudo tee /etc/init/zookeeper.override
+	$ sudo apt-get -y remove --purge zookeeper
+8. echo ip | sudo tee /etc/mesos-slave/ip
+9. echo zk://ip:2181/mesos | sudo tee /etc/mesos/zk
+10. sudo service mesos-slave restart
