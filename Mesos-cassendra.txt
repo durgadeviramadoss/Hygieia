@@ -1,0 +1,4 @@
+How to startup a new Cassandra cluster on Mesos
+How to configure Cassandra for high availability
+How to manage proper datacenter cluster design to optimize for scale and performance
+How to leverage Mesos-DNS inside the cluster for service discovery
